@@ -20,3 +20,7 @@
 #### valid: Verify that the blockchain is legitimate 
 #### update: tamper with blockchain transaction data 
 #### exit: exit 
+
+Thanks to shengxinjing/iblockchain, learn a lot from this repository.
+
+contact info: [Twitter](https://twitter.com/dvzhangtz)
