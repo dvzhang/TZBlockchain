@@ -21,11 +21,11 @@ const cryto = require('crypto')
 // FirstBlock
 const initBlock = {
     index: 0,
-    data: 'Hello woniu-chain!',
+    data: 'Hello TZChain!',
     prevHash: '0',
     timestamp: 1667847820620,
     nonce: 312,
-    hash: '0099943b70f941a9a75b3b28cd839f4755e85be8b80fa6ec428bc53ec0c8df34'
+    hash: '669a6860808540e07672594490c3e9b922fc9d9ae65605494a29891878e2d1be'
 }
 class Blockchain {
     constructor() {
@@ -33,7 +33,7 @@ class Blockchain {
         this.data = []
         this.difficulty = 2
         // const hash = this.computeHash(0, '0', new Date().getTime(), 'Hello FZ-chain', 1)
-        const hash = this.computeHash(0, '0', 1667847820620, 'Hello FZ-chain', 1)
+        const hash = this.computeHash(0, '0', 1667847820620, 'Hello TZChain!', 312)
         console.log(hash)
     }
 
@@ -47,6 +47,7 @@ class Blockchain {
         // check whether this block is correct
         if (this.isValidaBlock(newBlock) && this.isValidChain(this.blockchain)) {
             this.blockchain.push(newBlock)
+            return newBlock
         } else {
             console.log("Error, invalid Block")
         }
@@ -146,12 +147,14 @@ class Blockchain {
 
 }
 
-let bc = new Blockchain()
-bc.mine()
-bc.blockchain[1].nonce = 22
-bc.mine()
-bc.mine()
-bc.mine()
-bc.mine()
+// let bc = new Blockchain()
+// bc.mine()
+// bc.blockchain[1].nonce = 22
+// bc.mine()
+// bc.mine()
+// bc.mine()
+// bc.mine()
 
-console.log(bc)
+// console.log(bc)
+// new Blockchain()
+module.exports = Blockchain
