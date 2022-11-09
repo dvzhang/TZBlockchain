@@ -1,4 +1,7 @@
 # TZChain
+> My contact info: [Twitter](https://twitter.com/dvzhangtz) [Linkedin](https://www.linkedin.com/in/tianzuo-zhang/) Wechat: dvzhangtz
+> Thanks to shengxinjing/iblockchain, learn a lot from that repository.
+
 
 #### chian: View the entire blockchain data
 
@@ -21,6 +24,4 @@
 #### update: tamper with blockchain transaction data 
 #### exit: exit 
 
-Thanks to shengxinjing/iblockchain, learn a lot from this repository.
 
-contact info: [Twitter](https://twitter.com/dvzhangtz)
