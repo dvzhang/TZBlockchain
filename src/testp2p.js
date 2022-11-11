@@ -1,6 +1,10 @@
 const dgram = require('dgram')
 const udp = dgram.createSocket('udp4')
 
+
+udp.bind(8002)
+// udp.bind(0)
+
 udp.on('message', (data, remote) => {
     console.log('accept message' + data.toString())
     console.log(remote)
@@ -22,5 +26,3 @@ const host = process.argv[3]
 if (port && host){
     send('Hello', port, host)
 }
-
-udp.bind(8002)
