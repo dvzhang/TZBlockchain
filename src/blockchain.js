@@ -42,11 +42,59 @@ class Blockchain {
         return this.blockchain[this.blockchain.length - 1]
     }
 
-    mine() {
+    transfers(from, to, amount){
+        // check whether the account have enough money
+        if (from !== '0'){
+            const blance = this.blance(from)
+            if (blance < amount){
+                console.log('not enough blance', from, blance, amount)
+                return
+            }
+        }
+
+        // signature
+        // TODO
+
+        //transfer
+        const trasnObj = {from, to, amount}
+        this.data.push(trasnObj)
+        return trasnObj
+    }
+
+    blance(address){
+        
+        // View an account's balance
+        let blance = 0
+        this.blockchain.forEach(block=>{
+            // pass the init block
+            if (!Array.isArray(block.data)){
+                return 
+            }
+            // count the balance
+            block.data.forEach(trans=>{
+                if (address == trans.from){
+                    blance -= trans.amount
+                }
+                if (address == trans.to){
+                    blance += trans.amount
+                }
+            })
+        })
+        console.log(blance)
+        return blance
+    }
+
+
+    // package a transfer
+    mine(address) {
+        // reward to the miner
+        this.transfers("0", address, 100)
+        
         const newBlock = this.generateNewBlock()
         // check whether this block is correct
         if (this.isValidaBlock(newBlock) && this.isValidChain(this.blockchain)) {
             this.blockchain.push(newBlock)
+            this.data = []
             return newBlock
         } else {
             console.log("Error, invalid Block")
