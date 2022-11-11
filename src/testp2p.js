@@ -12,12 +12,15 @@ udp.on('listening', function() {
     console.log('udp server is listening' + address.address + ':' + address.port)    
 })
 
-udp.bind(8002)
 
 function send(message, port, host){
     console.log('send message', message, port, host)
     udp.send(Buffer.from(message), port, host)
 }
+const port = Number(process.argv[2])
+const host = process.argv[3]
+if (port && host){
+    send('Hello', port, host)
+}
 
-
-
+udp.bind(8002)
