@@ -41,20 +41,23 @@ function getPub(prv) {
     return ec.keyFromPrivate(prv).getPublic('hex').toString()
 }
 
-function verify({from, to, amount, signature}, pub) {
+function verify({from, to, amount, sig}, pub) {
     // console.log(from, to, amount, signature, pub)
+    // console.log({from, to, amount, sig})
     const keypairTemp = ec.keyFromPublic(pub, 'hex')
     const bufferMsg = Buffer.from(`${from}-${to}-${amount}`)
 
-    return keypairTemp.verify(bufferMsg, signature)
+    return keypairTemp.verify(bufferMsg, sig)
 }
 
-const trans = {from:'a', to:'b', amount:100}
-const signature = sign(trans)
-trans.signature = signature 
-console.log(signature)
-const isVerify = verify(trans, keys.pub)
-console.log(isVerify)
+module.exports = {sign, verify, keys}
+
+// const trans = {from:'a', to:'b', amount:100}
+// const signature = sign(trans)
+// trans.signature = signature 
+// console.log(signature)
+// const isVerify = verify(trans, keys.pub)
+// console.log(isVerify)
 
 
 // 2. use public key be the address

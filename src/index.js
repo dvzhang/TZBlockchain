@@ -2,6 +2,8 @@ const vorpal = require('vorpal')();
 const Blockchain = require('./blockchain');
 const blockchain = new Blockchain();
 const Table = require('cli-table')
+const rsa = require('./rsa')
+
 
 // [{name:TZ, age:18}]
 function formatLog(data) {
@@ -31,16 +33,28 @@ vorpal
     callback();
   });
 
+// vorpal
+//   .command('trans <from> <to> <amount>', "transfer")
+//   .action(function (args, callback){
+//   let trans = blockchain.transfers(args.from, args.to, args.amount)
+//   if (trans){
+//     formatLog(trans)
+//   }
+//   // if not callback, it will exit directly
+//   callback();
+// });
+
+
 vorpal
-  .command('trans <from> <to> <amount>', "transfer")
+  .command('trans <to> <amount>', "transfer")
   .action(function (args, callback){
-  let trans = blockchain.transfers(args.from, args.to, args.amount)
+    // use pub key be the from address
+  let trans = blockchain.transfers(rsa.keys.pub, args.to, args.amount)
   if (trans){
     formatLog(trans)
   }
   // if not callback, it will exit directly
   callback();
-
 });
 
 vorpal
@@ -62,10 +76,20 @@ vorpal
 
   });
 
+// vorpal
+//   .command('mine <address>', 'mine a block')
+//   .action(function (args, callback) {
+//     const newBlock = blockchain.mine(args.address)
+//     if (newBlock) {
+//       formatLog(newBlock)
+//     }
+//     callback();
+//   });
+
 vorpal
-  .command('mine <address>', 'mine a block')
+  .command('mine', 'mine a block')
   .action(function (args, callback) {
-    const newBlock = blockchain.mine(args.address)
+    const newBlock = blockchain.mine(rsa.keys.pub)
     if (newBlock) {
       formatLog(newBlock)
     }
@@ -78,6 +102,14 @@ vorpal
     formatLog(blockchain.blockchain)
     callback();
   });
+
+vorpal
+  .command('pub', 'View our address')
+  .action(function (args, callback) {
+    console.log(rsa.keys.pub)
+    callback();
+  });
+
 
 console.log("welcome to TZChain")
 vorpal.exec('help')

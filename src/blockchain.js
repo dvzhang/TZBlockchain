@@ -18,6 +18,12 @@
 
 const { time } = require('console')
 const cryto = require('crypto')
+const dgram = require('dgram')
+const { read } = require('fs')
+const { type } = require('os')
+const { listenerCount } = require('process')
+const rsa = require('./rsa')
+
 // FirstBlock
 const initBlock = {
     index: 0,
@@ -34,7 +40,76 @@ class Blockchain {
         this.difficulty = 2
         // const hash = this.computeHash(0, '0', new Date().getTime(), 'Hello FZ-chain', 1)
         const hash = this.computeHash(0, '0', 1667847820620, 'Hello TZChain!', 312)
+        this.peers = []
+        this.seed = {port:8001, address:'localhost'}
+        this.udp = dgram.createSocket('udp4')
+        this.init()
         console.log(hash)
+    }
+
+    init(){
+        this.bindP2p()
+        this.bindExit()
+    }
+    bindP2p(){
+        // get info from web
+        this.udp.on('message', (data, remote) => {
+            const {address, port} = remote
+            const action = JSON.parse(data)
+            // ds of data = {
+            //     type: "What's matter?"
+            //     data: 
+            // }
+            if (action.type){
+                this.dispatch(action, {address, port})
+            }
+        })
+        this.udp.on('listening', ()=>{
+            const address = this.udp.address()
+            console.log("[info]: end listening, port: " + address.port)
+        })
+        // 区分种子节点和普通节点
+        console.log(process.argv)
+        const port = Number(process.argv[2]) || 0
+        this.startNode(port)
+    }
+
+    startNode(port){
+        this.udp.bind(port)
+        // if not seed Node, need to send message to seed node that we are comeing
+        if (port !== 8001){
+            this.send({
+                type: "newpeer"
+            }, this.seed.port, this.seed.address)
+        }
+    }
+
+    send(message, port, address) {
+        this.udp.send(JSON.stringify(message), port, address)
+    }
+
+
+    dispatch(action, remote){
+        // get message from net
+        console.log('get message', action)
+        switch(action.type){
+            case 'newpeer': 
+                // 1. get its ip and port
+                // 2. tell it our node list
+                // 3. tell all node this newpeer
+                // 4. tell newpeer our chain
+                
+                console.log('Nice to e-meet you!', remote)
+                break
+            default:
+                console.log('I do not know what you mean', remote)
+        }
+    }
+
+    bindExit(){
+        process.on('exit', ()=>{
+            console.log('[info]: Bye, see you next time ~')
+        })
     }
 
     // get the newest block
@@ -52,13 +127,14 @@ class Blockchain {
             }
         }
 
-        // signature
-        // TODO
-
         //transfer
         const trasnObj = {from, to, amount}
-        this.data.push(trasnObj)
-        return trasnObj
+        // signature
+        const sig = rsa.sign(trasnObj)
+        console.log(sig)
+        const sigTrans = {from, to, amount, sig}
+        this.data.push(sigTrans)
+        return sigTrans
     }
 
     blance(address){
@@ -84,12 +160,27 @@ class Blockchain {
         return blance
     }
 
+    isValidTransfer(trans) {
+        // the address is pub key
+        return rsa.verify(trans, trans.from)
+    }
 
     // package a transfer
     mine(address) {
-        // reward to the miner
-        this.transfers("0", address, 100)
+        // check if the trans is valid
+        // // throw error if there is some transs is not valid
+        // if (!this.data.every(v=>this.isValidTransfer(v))){
+        //     console.log('trans not valid')
+        //     return
+        // }
         
+        // filter if there is some transs is not valid
+        // console.log(this.data)
+        this.data = this.data.filter(v => this.isValidTransfer(v))
+
+        // reward to the miner
+        this.transfers("0", address, 100)        
+
         const newBlock = this.generateNewBlock()
         // check whether this block is correct
         if (this.isValidaBlock(newBlock) && this.isValidChain(this.blockchain)) {
