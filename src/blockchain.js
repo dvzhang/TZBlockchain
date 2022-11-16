@@ -38,6 +38,7 @@ class Blockchain {
         this.blockchain = [initBlock]
         this.data = []
         this.difficulty = 2
+        this.peers = []
         // const hash = this.computeHash(0, '0', new Date().getTime(), 'Hello FZ-chain', 1)
         const hash = this.computeHash(0, '0', 1667847820620, 'Hello TZChain!', 312)
         this.peers = []
@@ -88,6 +89,11 @@ class Blockchain {
         this.udp.send(JSON.stringify(message), port, address)
     }
 
+    boardcast(action){
+        this.peers.forEach(v=>{
+            this.send(action, v.port, va.address)
+        })
+    }
 
     dispatch(action, remote){
         // get message from net
@@ -95,15 +101,60 @@ class Blockchain {
         switch(action.type){
             case 'newpeer': 
                 // 1. get its ip and port
+                this.send({
+                    type:'remoteAddress',
+                    data:remote
+                })
                 // 2. tell it our node list
+                this.send({
+                    type:'peerlist',
+                    data:this.peers
+                }, remote.port, remote.address)
+
                 // 3. tell all node this newpeer
+                this.boardcast({
+                    type:'sayhi',
+                    data:remote
+                })
+
                 // 4. tell newpeer our chain
-                
+                this.peers.push(remote)
                 console.log('Nice to e-meet you!', remote)
                 break
+            case 'remoteAddress': 
+                // get its ip and port
+                this.remote = action.data
+                break
+            case "peerlist":
+                // tell it our node list
+                const newPeers = action.data
+                this.addPeers()
+            case 'sayhi':
+                let remotePeer = action.data
+                this.peer.push(remotePeer)
+                console.log('[info] Nice to e-meet you, my friend.')
+                this.send({type:'hi'}, remotePeer.port, remotePeer.address)
+                break
+            case 'hi':
+                console.log(`${remote.address}:${remote.port} : ${action.data}`)
+                break 
             default:
                 console.log('I do not know what you mean', remote)
         }
+    }
+
+    addPeers(peers){
+        peers.forEach(peer =>{
+            // if there is no new Node, add one
+            if(this.peer.find(v=>this.isEqualPeer(peer, v))){
+                this.peers.push(peer)
+            }
+
+        })
+    }
+
+    isEqualPeer(peer1, peer2){
+        return peer1.address == peer2.address && peer1.port == peer2.port
     }
 
     bindExit(){
