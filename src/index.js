@@ -7,6 +7,9 @@ const rsa = require('./rsa')
 
 // [{name:TZ, age:18}]
 function formatLog(data) {
+  if (!data || data.length == 0){
+    return
+  }
   if (!Array.isArray(data)) {
     data = [data]
   }
@@ -109,6 +112,24 @@ vorpal
     console.log(rsa.keys.pub)
     callback();
   });
+
+vorpal
+  .command('peers', 'View our node list')
+  .action(function (args, callback) {
+    formatLog(blockchain.peers)
+    callback();
+  });
+
+vorpal
+  .command('chat <msg>', 'message with other node')
+  .action(function (args, callback) {
+    blockchain.boardcast({
+      type:'hi',
+      data:args.msg
+    })
+    callback();
+  });
+
 
 
 console.log("welcome to TZChain")

@@ -41,7 +41,6 @@ class Blockchain {
         this.peers = []
         // const hash = this.computeHash(0, '0', new Date().getTime(), 'Hello FZ-chain', 1)
         const hash = this.computeHash(0, '0', 1667847820620, 'Hello TZChain!', 312)
-        this.peers = []
         this.seed = {port:8001, address:'localhost'}
         this.udp = dgram.createSocket('udp4')
         this.init()
@@ -82,16 +81,20 @@ class Blockchain {
             this.send({
                 type: "newpeer"
             }, this.seed.port, this.seed.address)
+
+            // add root node
+            this.peers.push(this.seed)
         }
     }
 
     send(message, port, address) {
+        console.log
         this.udp.send(JSON.stringify(message), port, address)
     }
 
     boardcast(action){
         this.peers.forEach(v=>{
-            this.send(action, v.port, va.address)
+            this.send(action, v.port, v.address)
         })
     }
 
@@ -101,10 +104,11 @@ class Blockchain {
         switch(action.type){
             case 'newpeer': 
                 // 1. get its ip and port
+                // console.log(remote)
                 this.send({
                     type:'remoteAddress',
                     data:remote
-                })
+                }, remote.port, remote.address)
                 // 2. tell it our node list
                 this.send({
                     type:'peerlist',
@@ -118,20 +122,41 @@ class Blockchain {
                 })
 
                 // 4. tell newpeer our chain
+                this.send({
+                    type:'blockchain',
+                    data:JSON.stringify({
+                        blockchain:this.blockchain,
+                        trans:this.data 
+                    })
+                }, remote.port, remote.address)
                 this.peers.push(remote)
                 console.log('Nice to e-meet you!', remote)
+
                 break
+            case 'blockchain':
+                //  synchronize our chain
+                let allData = JSON.parse(action.data)
+                let newChain = allData.blockchain
+                // if(newChain.length > 1){
+                this.replaceChain(newChain)
+                // }
             case 'remoteAddress': 
                 // get its ip and port
                 this.remote = action.data
+                console.log('remoteAddress:', this.remote)
                 break
-            case "peerlist":
-                // tell it our node list
+            case 'peerlist':
+                // get node list
                 const newPeers = action.data
-                this.addPeers()
+                console.log("peerlist", newPeers)
+
+                this.addPeers(newPeers)
+                this.boardcast({ type: 'hi' })
+                break
             case 'sayhi':
                 let remotePeer = action.data
-                this.peer.push(remotePeer)
+                // console.log('sayhi', remotePeer)
+                this.peers.push(remotePeer)
                 console.log('[info] Nice to e-meet you, my friend.')
                 this.send({type:'hi'}, remotePeer.port, remotePeer.address)
                 break
@@ -143,13 +168,25 @@ class Blockchain {
         }
     }
 
-    addPeers(peers){
-        peers.forEach(peer =>{
-            // if there is no new Node, add one
-            if(this.peer.find(v=>this.isEqualPeer(peer, v))){
-                this.peers.push(peer)
-            }
+    replaceChain(newChain){
+        if(newChain.length == 1){
+            return
+        }
+        if (this.isValidChain(newChain) && newChain.length > this.blockchain.length){
+            // copy a chain
+            this.blockchain = JSON.parse(JSON.stringify(newChain))
+        } else {
+            console.log('[error]: not correct')
+        }
+    }
 
+    addPeers (newPeers) {
+        console.log(newPeers)
+
+        newPeers.forEach(peer => {
+          if (!this.peers.find(v => this.isEqualPeer(v, peer))) {
+            this.peers.push(peer)
+          }
         })
     }
 
