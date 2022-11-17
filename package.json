@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node src/index.js",
     "start": "node src/index.js",
+    "lint": "eslint --fix --ext .js src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,5 +15,12 @@
     "cli-table": "^0.3.11",
     "elliptic": "^6.5.4",
     "vorpal": "^1.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.27.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.5.1",
+    "eslint-plugin-promise": "^6.1.1"
   }
 }
