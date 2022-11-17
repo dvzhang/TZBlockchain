@@ -41,7 +41,7 @@ class Blockchain {
     this.peers = []
     // const hash = this.computeHash(0, '0', new Date().getTime(), 'Hello FZ-chain', 1)
     const hash = this.computeHash(0, '0', 1667847820620, 'Hello TZChain!', 312)
-    this.seed = { port: 8001, address: '49.51.69.239' }
+    this.seed = { port: 8001, address: '206.72.87.160' }
     this.udp = dgram.createSocket('udp4')
     this.init()
     console.log(hash)
@@ -105,11 +105,13 @@ class Blockchain {
     switch (action.type) {
       case 'newpeer':
         // 1. get its ip and port
-        // console.log(remote)
+        console.log(remote)
         this.send({
           type: 'remoteAddress',
           data: remote
         }, remote.port, remote.address)
+        console.log(remote)
+
         // 2. tell it our node list
         this.send({
           type: 'peerlist',
