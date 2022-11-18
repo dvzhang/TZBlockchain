@@ -4,15 +4,23 @@
 > Thanks to shengxinjing/iblockchain, learn a lot from that repository.
 
 ## Start
-npm start
+```npm start```
 
+
+![start](pic/1.start.png)
 
 ## Command
 #### chain: View the entire blockchain data
+![chain](pic/2.chain.png)
 
 #### mine: Mining, new blocks 
+![mine](pic/3.mine.png)
+
 #### pub: View local address (public key) 
+![pub](pic/4.pub.png)
+
 #### trans: Transfer 
+![trans](pic/5.trans.png)
 
 #### pending: View unpacked transactions 
 #### blance: View address balance (default local)) 
