@@ -3,8 +3,12 @@
 > 
 > Thanks to shengxinjing/iblockchain, learn a lot from that repository.
 
+## Start
+npm start
 
-#### chian: View the entire blockchain data
+
+## Command
+#### chain: View the entire blockchain data
 
 #### mine: Mining, new blocks 
 #### pub: View local address (public key) 

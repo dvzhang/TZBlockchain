@@ -232,7 +232,7 @@ class Blockchain {
 
   replaceTrans (newTrans) {
     if (newTrans.every(v => this.isValidTransfer(v))) {
-      this.data = trans
+      this.data = newTrans
     }
   }
 
